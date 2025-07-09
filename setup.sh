@@ -23,22 +23,24 @@ if ! grep -q 'flutter/bin' ~/.bashrc; then
   echo 'export PATH="$HOME/flutter/bin:$PATH"' >> ~/.bashrc
 fi
 
-# 4) Run flutter doctor (initial)
+# 4) Initial Flutter doctor
 flutter doctor
 
 # 5) Install Android SDK command-line tools
 ANDROID_SDK_ROOT="$HOME/Android/Sdk"
 if [ ! -d "$ANDROID_SDK_ROOT/cmdline-tools/latest" ]; then
-  mkdir -p "$ANDROID_SDK_ROOT/cmdline-tools"
+  mkdir -p "$ANDROID_SDK_ROOT"
   cd "$ANDROID_SDK_ROOT"
   wget https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip -O cmdline-tools.zip
-  unzip cmdline-tools.zip
-  rm cmdline-tools.zip
+  # Extract to a temp folder to avoid nested cmdline-tools directory
+  mkdir -p temp-tools
+  unzip -q cmdline-tools.zip -d temp-tools
   mkdir -p cmdline-tools/latest
-  mv cmdline-tools/* cmdline-tools/latest/
+  mv temp-tools/cmdline-tools/* cmdline-tools/latest/
+  rm -rf temp-tools cmdline-tools.zip
 fi
 
-# 6) Add Android tools to PATH for this session
+# 6) Add Android tools to PATH
 export ANDROID_SDK_ROOT
 export PATH="$ANDROID_SDK_ROOT/cmdline-tools/latest/bin:$ANDROID_SDK_ROOT/platform-tools:$PATH"
 # Persist to ~/.bashrc
@@ -59,7 +61,7 @@ flutter config --android-sdk "$ANDROID_SDK_ROOT"
 # 9) Accept Android licenses
 yes | flutter doctor --android-licenses
 
-# 10) (Optional) Install Chromium for Flutter web
+# 10) (Optional) Install Chromium for Flutter web support
 if ! command -v chromium-browser &> /dev/null; then
   sudo apt install -y chromium-browser
 fi
