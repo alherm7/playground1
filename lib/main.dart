@@ -1,22 +1,23 @@
-// lib/main.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
-import 'widgets/timer_home_page.dart';
+import 'theme.dart';
+import 'screens/home_screen.dart';
 
 void main() {
-  runApp(const ProviderScope(child: WorkoutTimerApp()));
+  WidgetsFlutterBinding.ensureInitialized();
+  runApp(const ProviderScope(child: App()));
 }
 
-class WorkoutTimerApp extends StatelessWidget {
-  const WorkoutTimerApp({super.key});
+class App extends StatelessWidget {
+  const App({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'Workout Timer',
-      theme: ThemeData(primarySwatch: Colors.blue),
-      home: const TimerHomePage(),
+      theme: buildAppTheme(),
+      home: const HomeScreen(),
     );
   }
 }
