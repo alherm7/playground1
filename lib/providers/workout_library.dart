@@ -4,10 +4,12 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
 import '../models/models.dart';
 
-final _uuid = Uuid();
+const _uuid = Uuid();
 const _kKey = 'custom_workout_plans_v1';
 
-final workoutLibraryProvider = StateNotifierProvider<WorkoutLibrary, List<WorkoutPlan>>((ref) => WorkoutLibrary(ref));
+final workoutLibraryProvider =
+    StateNotifierProvider<WorkoutLibrary, List<WorkoutPlan>>(
+        (ref) => WorkoutLibrary(ref));
 
 class WorkoutLibrary extends StateNotifier<List<WorkoutPlan>> {
   final Ref ref;
@@ -64,7 +66,8 @@ class WorkoutLibrary extends StateNotifier<List<WorkoutPlan>> {
     final prefs = await SharedPreferences.getInstance();
     final raw = prefs.getString(_kKey);
     if (raw == null) return;
-    final list = (jsonDecode(raw) as List).map((e) => WorkoutPlan.fromJson(e)).toList();
+    final list =
+        (jsonDecode(raw) as List).map((e) => WorkoutPlan.fromJson(e)).toList();
     state = [..._defaults, ...list];
   }
 
@@ -72,14 +75,16 @@ class WorkoutLibrary extends StateNotifier<List<WorkoutPlan>> {
     final prefs = await SharedPreferences.getInstance();
     final custom = state.where((p) => !p.builtin).toList();
     final newList = [...custom, plan];
-    await prefs.setString(_kKey, jsonEncode(newList.map((e) => e.toJson()).toList()));
+    await prefs.setString(
+        _kKey, jsonEncode(newList.map((e) => e.toJson()).toList()));
     state = [..._defaults, ...newList];
   }
 
   Future deletePlan(String id) async {
     final prefs = await SharedPreferences.getInstance();
     final custom = state.where((p) => !p.builtin && p.id != id).toList();
-    await prefs.setString(_kKey, jsonEncode(custom.map((e) => e.toJson()).toList()));
+    await prefs.setString(
+        _kKey, jsonEncode(custom.map((e) => e.toJson()).toList()));
     state = [..._defaults, ...custom];
   }
 }

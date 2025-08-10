@@ -95,6 +95,10 @@ class _TimerTab extends ConsumerWidget {
     }
 
     final s = session!;
+    final denom = s.isRest
+        ? (s.exerciseIndex == 0 ? s.plan.restBetweenRounds.toDouble() : s.plan.restBetweenExercises.toDouble())
+        : s.plan.exercises[s.exerciseIndex].seconds.toDouble();
+    final progress = s.secondsLeft / denom;
     
 
     return Padding(

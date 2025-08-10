@@ -19,12 +19,16 @@ class HistoryScreen extends ConsumerWidget {
       separatorBuilder: (_, __) => const SizedBox(height: 12),
       itemBuilder: (ctx, i) {
         final l = logs[i];
-        final weather = l.temperatureC != null ? '• ${l.temperatureC!.toStringAsFixed(0)}°C wind ${l.windKph?.toStringAsFixed(0) ?? '-'}' : '';
-        final where = l.latitude != null ? '(@ ${l.latitude!.toStringAsFixed(2)}, ${l.longitude!.toStringAsFixed(2)})' : '';
+        final weather = l.temperatureC != null
+            ? '• ${l.temperatureC!.toStringAsFixed(0)}°C wind ${l.windKph?.toStringAsFixed(0) ?? '-'}'
+            : '';
+        final where = l.latitude != null
+            ? '(@ ${l.latitude!.toStringAsFixed(2)}, ${l.longitude!.toStringAsFixed(2)})'
+            : '';
         return Card(
           child: ListTile(
             title: Text(l.planName),
-            subtitle: Text('${fmt.format(l.startedAt)} ${weather}\n${where}'),
+            subtitle: Text('${fmt.format(l.startedAt)} $weather\n$where'),
             isThreeLine: true,
             trailing: Text('${(l.totalSeconds / 60).floor()}m'),
           ),

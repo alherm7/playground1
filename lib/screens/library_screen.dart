@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/workout_library.dart';
-import '../models/models.dart';
 import '../providers/timer_controller.dart';
 import 'plan_builder_screen.dart';
 

@@ -6,8 +6,9 @@ import '../models/models.dart';
 import '../services/location_service.dart';
 import '../services/weather_service.dart';
 
-final logsProvider = StateNotifierProvider<WorkoutLogs, List<WorkoutLog>>((ref) => WorkoutLogs(ref));
-final _uuid = Uuid();
+final logsProvider = StateNotifierProvider<WorkoutLogs, List<WorkoutLog>>(
+    (ref) => WorkoutLogs(ref));
+const _uuid = Uuid();
 const _kLogsKey = 'workout_logs_v1';
 
 class WorkoutLogs extends StateNotifier<List<WorkoutLog>> {
@@ -20,11 +21,17 @@ class WorkoutLogs extends StateNotifier<List<WorkoutLog>> {
     final prefs = await SharedPreferences.getInstance();
     final raw = prefs.getString(_kLogsKey);
     if (raw == null) return;
-    final list = (jsonDecode(raw) as List).map((e) => WorkoutLog.fromJson(e)).toList();
+    final list =
+        (jsonDecode(raw) as List).map((e) => WorkoutLog.fromJson(e)).toList();
     state = list;
   }
 
-  Future<void> addLog({required String planName, required DateTime startedAt, required int totalSeconds, required int roundsCompleted, String? notes}) async {
+  Future<void> addLog(
+      {required String planName,
+      required DateTime startedAt,
+      required int totalSeconds,
+      required int roundsCompleted,
+      String? notes}) async {
     double? lat, lon, temp, wind;
     int? code;
 
@@ -59,6 +66,7 @@ class WorkoutLogs extends StateNotifier<List<WorkoutLog>> {
     final newList = [log, ...state];
     state = newList;
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(_kLogsKey, jsonEncode(newList.map((e) => e.toJson()).toList()));
+    await prefs.setString(
+        _kLogsKey, jsonEncode(newList.map((e) => e.toJson()).toList()));
   }
 }

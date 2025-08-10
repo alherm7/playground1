@@ -1,4 +1,6 @@
 /// lib/providers/timer_provider.dart
+library;
+
 import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 

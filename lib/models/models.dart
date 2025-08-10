@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 enum WorkoutCategory { cardio, strength, mobility }
 
 class Exercise {
