@@ -23,3 +23,5 @@ windows/
 **/Pods/             # if you ever run `pod install`
 **/DerivedData/
 .flutter-plugins-dependencies
+
+macos.bak/*
