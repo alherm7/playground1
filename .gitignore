@@ -22,3 +22,4 @@ windows/
 # ---- Android / iOS build outputs ----
 **/Pods/             # if you ever run `pod install`
 **/DerivedData/
+.flutter-plugins-dependencies
