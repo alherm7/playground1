@@ -6,7 +6,8 @@ class Exercise {
   const Exercise({required this.name, required this.seconds});
 
   Map<String, dynamic> toJson() => {'name': name, 'seconds': seconds};
-  factory Exercise.fromJson(Map<String, dynamic> j) => Exercise(name: j['name'], seconds: j['seconds']);
+  factory Exercise.fromJson(Map<String, dynamic> j) =>
+      Exercise(name: j['name'], seconds: j['seconds']);
 }
 
 class WorkoutPlan {
@@ -44,8 +45,11 @@ class WorkoutPlan {
   factory WorkoutPlan.fromJson(Map<String, dynamic> j) => WorkoutPlan(
         id: j['id'],
         name: j['name'],
-        category: WorkoutCategory.values.firstWhere((e) => e.name == j['category'], orElse: () => WorkoutCategory.cardio),
-        exercises: (j['exercises'] as List).map((e) => Exercise.fromJson(e)).toList(),
+        category: WorkoutCategory.values.firstWhere(
+            (e) => e.name == j['category'],
+            orElse: () => WorkoutCategory.cardio),
+        exercises:
+            (j['exercises'] as List).map((e) => Exercise.fromJson(e)).toList(),
         rounds: j['rounds'],
         restBetweenExercises: j['restBetweenExercises'],
         restBetweenRounds: j['restBetweenRounds'],
