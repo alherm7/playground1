@@ -1,3 +1,4 @@
+// providers/timer_controller.dart
 import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/models.dart';
@@ -24,7 +25,8 @@ class TimerSession {
     required this.state,
   });
 
-  String get currentLabel => isRest ? 'Rest' : plan.exercises[exerciseIndex].name;
+  String get currentLabel =>
+      isRest ? 'Rest' : plan.exercises[exerciseIndex].name;
 
   TimerSession copyWith({
     WorkoutPlan? plan,
@@ -51,7 +53,8 @@ final ttsProvider = Provider<TtsService>((_) => TtsService());
 final voiceEnabledProvider = StateProvider<bool>((_) => true);
 final currentPlanProvider = StateProvider<WorkoutPlan?>((_) => null);
 
-final timerProvider = StateNotifierProvider<TimerController, TimerSession?>((ref) => TimerController(ref));
+final timerProvider = StateNotifierProvider<TimerController, TimerSession?>(
+    (ref) => TimerController(ref));
 
 class TimerController extends StateNotifier<TimerSession?> {
   final Ref ref;
@@ -70,7 +73,8 @@ class TimerController extends StateNotifier<TimerSession?> {
       totalElapsed: 0,
       state: SessionState.running,
     );
-    _announce('Starting ${plan.name}. Round 1 of ${plan.rounds}. First: ${plan.exercises.first.name}.');
+    _announce(
+        'Starting ${plan.name}. Round 1 of ${plan.rounds}. First: ${plan.exercises.first.name}.');
     _ticker = Timer.periodic(const Duration(seconds: 1), (_) => _tick());
   }
 
@@ -97,7 +101,8 @@ class TimerController extends StateNotifier<TimerSession?> {
     if (s.secondsLeft <= 1) {
       _advance();
     } else {
-      final next = s.copyWith(secondsLeft: s.secondsLeft - 1, totalElapsed: s.totalElapsed + 1);
+      final next = s.copyWith(
+          secondsLeft: s.secondsLeft - 1, totalElapsed: s.totalElapsed + 1);
       state = next;
       if ([3, 2, 1].contains(next.secondsLeft)) {
         _announce('${next.secondsLeft}');
@@ -120,9 +125,11 @@ class TimerController extends StateNotifier<TimerSession?> {
           isRest: true,
           secondsLeft: plan.restBetweenExercises,
           totalElapsed: s.totalElapsed + 1,
-          exerciseIndex: nextExercise, // point to upcoming exercise for "Next:" label
+          exerciseIndex:
+              nextExercise, // point to upcoming exercise for "Next:" label
         );
-        _announce('Rest ${plan.restBetweenExercises} seconds. Next: ${plan.exercises[nextExercise].name}.');
+        _announce(
+            'Rest ${plan.restBetweenExercises} seconds. Next: ${plan.exercises[nextExercise].name}.');
       } else {
         // rest between rounds or finish
         final isLastRound = s.roundIndex == plan.rounds - 1;
@@ -134,17 +141,22 @@ class TimerController extends StateNotifier<TimerSession?> {
             roundIndex: s.roundIndex + 1, // upcoming round index
             exerciseIndex: 0,
           );
-          _announce('Round ${s.roundIndex + 1} complete. Rest ${plan.restBetweenRounds} seconds.');
+          _announce(
+              'Round ${s.roundIndex + 1} complete. Rest ${plan.restBetweenRounds} seconds.');
         } else {
           _ticker?.cancel();
-          state = s.copyWith(state: SessionState.finished, totalElapsed: s.totalElapsed + 1);
+          state = s.copyWith(
+              state: SessionState.finished, totalElapsed: s.totalElapsed + 1);
           _announce('Workout complete. Awesome job!');
         }
       }
     } else {
       // Coming out of a rest -> start the designated exercise
       final currentExercise = s.plan.exercises[s.exerciseIndex];
-      state = s.copyWith(isRest: false, secondsLeft: currentExercise.seconds, totalElapsed: s.totalElapsed + 1);
+      state = s.copyWith(
+          isRest: false,
+          secondsLeft: currentExercise.seconds,
+          totalElapsed: s.totalElapsed + 1);
       _announce('Go: ${currentExercise.name}!');
     }
   }
@@ -166,4 +178,30 @@ class TimerController extends StateNotifier<TimerSession?> {
     pep.shuffle();
     return '$base ${pep.first}';
   }
+}
+
+class Segment {
+  final String label;
+  final int seconds;
+  final bool isRest;
+  const Segment(this.label, this.seconds, this.isRest);
+}
+
+List<Segment> buildSchedule(WorkoutPlan plan) {
+  final segs = <Segment>[];
+  for (var r = 0; r < plan.rounds; r++) {
+    for (var i = 0; i < plan.exercises.length; i++) {
+      final ex = plan.exercises[i];
+      segs.add(Segment(ex.name, ex.seconds, false)); // work
+      final isLastExercise = i == plan.exercises.length - 1;
+      if (!isLastExercise && plan.restBetweenExercises > 0) {
+        segs.add(Segment('Rest', plan.restBetweenExercises, true));
+      }
+    }
+    final isLastRound = r == plan.rounds - 1;
+    if (!isLastRound && plan.restBetweenRounds > 0) {
+      segs.add(Segment('Round Rest', plan.restBetweenRounds, true));
+    }
+  }
+  return segs;
 }

@@ -16,18 +16,18 @@ class WorkoutPlan {
   final WorkoutCategory category;
   final List<Exercise> exercises;
   final int rounds;
-  final int restBetweenExercises; // seconds
-  final int restBetweenRounds; // seconds
-  final bool builtin;
+  final int restBetweenExercises;
+  final int restBetweenRounds;
+  final bool builtin; // <- presets: true, user plans: false
 
   const WorkoutPlan({
     required this.id,
     required this.name,
     required this.category,
     required this.exercises,
-    this.rounds = 3,
-    this.restBetweenExercises = 15,
-    this.restBetweenRounds = 60,
+    required this.rounds,
+    required this.restBetweenExercises,
+    required this.restBetweenRounds,
     this.builtin = false,
   });
 
@@ -45,9 +45,8 @@ class WorkoutPlan {
   factory WorkoutPlan.fromJson(Map<String, dynamic> j) => WorkoutPlan(
         id: j['id'],
         name: j['name'],
-        category: WorkoutCategory.values.firstWhere(
-            (e) => e.name == j['category'],
-            orElse: () => WorkoutCategory.cardio),
+        category:
+            WorkoutCategory.values.firstWhere((c) => c.name == j['category']),
         exercises:
             (j['exercises'] as List).map((e) => Exercise.fromJson(e)).toList(),
         rounds: j['rounds'],
