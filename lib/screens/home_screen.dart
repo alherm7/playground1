@@ -335,7 +335,7 @@ class _TimerTab extends ConsumerWidget {
                   const SizedBox(height: 8),
                   DropdownButton<WorkoutPlan>(
                     isExpanded: true,
-                    value: plan,
+                    value: lib.contains(plan) ? plan : null,
                     hint: const Text('Select a plan from your library'),
                     items: lib
                         .map((p) => DropdownMenuItem(

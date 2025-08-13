@@ -12,7 +12,6 @@ class PlanBuilderScreen extends ConsumerStatefulWidget {
 
 class _PlanBuilderScreenState extends ConsumerState<PlanBuilderScreen> {
   final _form = GlobalKey<FormState>();
-  final _uuid = const Uuid();
 
   String _name = '';
   WorkoutCategory _category = WorkoutCategory.cardio;
@@ -167,8 +166,7 @@ class _PlanBuilderScreenState extends ConsumerState<PlanBuilderScreen> {
                 );
 
                 await ref.read(workoutLibraryProvider.notifier).addPlan(plan);
-
-                if (!mounted) return;
+                if (!context.mounted) return;
                 Navigator.of(context).pop();
               },
             ),
