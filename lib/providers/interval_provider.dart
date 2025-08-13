@@ -7,7 +7,9 @@ import '../models/interval_set.dart';
 final intervalProvider = StateProvider<IntervalSet>(
   (_) => const IntervalSet(
     work: Duration(seconds: 30),
-    rest: Duration(seconds: 10),
+    rest: Duration(seconds: 30),
+    exercises: 5,
     rounds: 5,
+    roundReset: Duration(seconds: 10),
   ),
 );

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/workout_library.dart';
-import '../providers/timer_controller.dart'; // for currentPlanProvider
+import '../providers/timer_controller.dart';
 import 'plan_builder_screen.dart';
 
 class LibraryScreen extends ConsumerWidget {
@@ -15,10 +15,9 @@ class LibraryScreen extends ConsumerWidget {
       appBar: AppBar(title: const Text('Workout Library')),
       body: ListView.separated(
         padding: const EdgeInsets.all(16),
-        itemCount: plans.length + 1, // +1 for the "Create" card
+        itemCount: plans.length + 1, // extra card for "Create"
         separatorBuilder: (_, __) => const SizedBox(height: 12),
         itemBuilder: (ctx, index) {
-          // First card: create a custom plan
           if (index == 0) {
             return Card(
               child: ListTile(
