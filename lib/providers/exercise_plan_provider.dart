@@ -32,3 +32,8 @@ final exercisePlanProvider = StateProvider<ExercisePlanNames>(
           'Exercise 4',
           'Exercise 5',
         ]));
+
+/// Stores the current selection in the unified dropdown on the start screen.
+/// Possible values: 'preset:Cardio', 'preset:Strength', 'preset:Mobility',
+/// or 'lib:[planId]'.
+final startSelectionProvider = StateProvider<String?>((_) => null);
