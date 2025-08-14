@@ -185,101 +185,25 @@ class _TimerTab extends ConsumerWidget {
             Expanded(
               child: ListView(
                 children: [
-                  Text('Workout selection',
+                  Text('Choose plan',
                       style: Theme.of(context).textTheme.titleMedium),
                   const SizedBox(height: 8),
                   DropdownButton<String>(
                     isExpanded: true,
-                    value: selection,
-                    hint: const Text('Choose a preset or a saved plan'),
-                    items: [
-                      const DropdownMenuItem(
-                          value: 'preset:Cardio',
-                          child: Text('Preset – Cardio')),
-                      const DropdownMenuItem(
-                          value: 'preset:Strength',
-                          child: Text('Preset – Strength')),
-                      const DropdownMenuItem(
-                          value: 'preset:Mobility',
-                          child: Text('Preset – Mobility')),
-                      const DropdownMenuItem(
-                          enabled: false,
-                          value: 'divider',
-                          child: Divider(height: 1)),
-                      ...lib.map((p) => DropdownMenuItem<String>(
-                            value: 'lib:${p.id}',
-                            child: Text('Library – ${p.name}'),
-                          )),
-                    ],
+                    value: selection != null && selection.startsWith('lib:')
+                        ? selection
+                        : null,
+                    hint: const Text('Choose a plan from your library'),
+                    items: lib
+                        .map((p) => DropdownMenuItem<String>(
+                              value: 'lib:${p.id}',
+                              child: Text(p.name),
+                            ))
+                        .toList(),
                     onChanged: (key) {
                       if (key == null) return;
                       ref.read(startSelectionProvider.notifier).state = key;
-                      if (key.startsWith('preset:')) {
-                        final preset = key.split(':').last;
-                        if (preset == 'Cardio') {
-                          ref.read(intervalProvider.notifier).state =
-                              intervals.copyWith(
-                            work: const Duration(seconds: 50),
-                            rest: const Duration(seconds: 10),
-                            exercises: 5,
-                            rounds: 5,
-                            roundReset: const Duration(seconds: 5),
-                          );
-                          ref.read(exercisePlanProvider.notifier).state =
-                              const ExercisePlanNames(
-                            sourceName: 'Cardio',
-                            names: [
-                              'Jumping Jacks',
-                              'High Knees',
-                              'Mountain Climbers',
-                              'Burpees',
-                              'Skaters',
-                            ],
-                          );
-                        } else if (preset == 'Strength') {
-                          ref.read(intervalProvider.notifier).state =
-                              intervals.copyWith(
-                            work: const Duration(seconds: 40),
-                            rest: const Duration(seconds: 20),
-                            exercises: 5,
-                            rounds: 4,
-                            roundReset: const Duration(seconds: 30),
-                          );
-                          ref.read(exercisePlanProvider.notifier).state =
-                              const ExercisePlanNames(
-                            sourceName: 'Strength',
-                            names: [
-                              'Push-ups',
-                              'Squats',
-                              'Lunges',
-                              'Plank',
-                              'Supermans',
-                            ],
-                          );
-                        } else if (preset == 'Mobility') {
-                          ref.read(intervalProvider.notifier).state =
-                              intervals.copyWith(
-                            work: const Duration(seconds: 30),
-                            rest: const Duration(seconds: 15),
-                            exercises: 5,
-                            rounds: 3,
-                            roundReset: const Duration(seconds: 20),
-                          );
-                          ref.read(exercisePlanProvider.notifier).state =
-                              const ExercisePlanNames(
-                            sourceName: 'Mobility',
-                            names: [
-                              'Neck Rolls',
-                              'Shoulder Circles',
-                              'Hip Openers',
-                              'Hamstring Stretch',
-                              'Calf Stretch',
-                            ],
-                          );
-                        }
-                        // We intentionally do not set a library plan selection
-                        ref.read(currentPlanProvider.notifier).state = null;
-                      } else if (key.startsWith('lib:')) {
+                      if (key.startsWith('lib:')) {
                         final id = key.substring(4);
                         final p = lib.firstWhere((e) => e.id == id,
                             orElse: () => lib.first);
