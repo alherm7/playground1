@@ -1,10 +1,8 @@
 import 'dart:convert';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:uuid/uuid.dart';
 import '../models/models.dart';
 
-const _uuid = Uuid();
 const _kKey = 'custom_workout_plans_v1';
 
 final workoutLibraryProvider =
@@ -19,7 +17,7 @@ class WorkoutLibrary extends StateNotifier<List<WorkoutPlan>> {
 
   static List<WorkoutPlan> get _defaults => [
         WorkoutPlan(
-          id: _uuid.v4(),
+          id: 'builtin-cardio-blaster',
           name: 'Cardio Blaster',
           category: WorkoutCategory.cardio,
           exercises: const [
@@ -33,7 +31,7 @@ class WorkoutLibrary extends StateNotifier<List<WorkoutPlan>> {
           builtin: true,
         ),
         WorkoutPlan(
-          id: _uuid.v4(),
+          id: 'builtin-strength-circuit',
           name: 'Strength Circuit',
           category: WorkoutCategory.strength,
           exercises: const [
@@ -47,7 +45,7 @@ class WorkoutLibrary extends StateNotifier<List<WorkoutPlan>> {
           builtin: true,
         ),
         WorkoutPlan(
-          id: _uuid.v4(),
+          id: 'builtin-stretch-flow',
           name: 'Stretch Flow',
           category: WorkoutCategory.mobility,
           exercises: const [

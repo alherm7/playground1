@@ -76,6 +76,15 @@ class _TimerTab extends ConsumerWidget {
     if (session == null) {
       final intervals = ref.watch(intervalProvider);
       final total = intervals.totalDuration;
+
+      // Check if current selection has uniform exercise times
+      bool hasUniformTimes = true;
+      if (selection != null && selection.startsWith('lib:')) {
+        final id = selection.substring(4);
+        final selectedPlan =
+            lib.firstWhere((e) => e.id == id, orElse: () => lib.first);
+        hasUniformTimes = selectedPlan.hasUniformExerciseTimes;
+      }
       String fmt(Duration d) {
         String two(int v) => v.toString().padLeft(2, '0');
         final m = d.inMinutes;
@@ -169,7 +178,18 @@ class _TimerTab extends ConsumerWidget {
             Center(
               child: InkResponse(
                 onTap: () {
-                  final chosenPlan = buildPlanFromIntervals(intervals);
+                  WorkoutPlan chosenPlan;
+                  if (selection != null && selection.startsWith('lib:')) {
+                    final id = selection.substring(4);
+                    final selectedPlan = lib.firstWhere((e) => e.id == id,
+                        orElse: () => lib.first);
+                    // Use the original plan if it has non-uniform times, otherwise build from intervals
+                    chosenPlan = selectedPlan.hasUniformExerciseTimes
+                        ? buildPlanFromIntervals(intervals)
+                        : selectedPlan;
+                  } else {
+                    chosenPlan = buildPlanFromIntervals(intervals);
+                  }
                   ref.read(timerProvider.notifier).start(chosenPlan);
                 },
                 radius: 56,
@@ -235,36 +255,65 @@ class _TimerTab extends ConsumerWidget {
                     icon: Icons.play_circle_fill,
                     label: 'Work',
                     value: fmt(intervals.work),
-                    onTap: pickWork,
+                    onTap: hasUniformTimes ? pickWork : null,
+                    enabled: hasUniformTimes,
                   ),
                   _ConfigTile(
                     color: Colors.red.shade900,
                     icon: Icons.pause_circle_filled,
                     label: 'Rest',
                     value: fmt(intervals.rest),
-                    onTap: pickRest,
+                    onTap: hasUniformTimes ? pickRest : null,
+                    enabled: hasUniformTimes,
                   ),
                   _ConfigTile(
                     color: Colors.grey.shade800,
                     icon: Icons.bolt,
                     label: 'Exercises',
                     value: '${intervals.exercises}',
-                    onTap: pickExercises,
+                    onTap: hasUniformTimes ? pickExercises : null,
+                    enabled: hasUniformTimes,
                   ),
                   _ConfigTile(
                     color: Colors.indigo.shade900,
                     icon: Icons.refresh,
                     label: 'Rounds',
                     value: '${intervals.rounds}x',
-                    onTap: pickRounds,
+                    onTap: hasUniformTimes ? pickRounds : null,
+                    enabled: hasUniformTimes,
                   ),
                   _ConfigTile(
                     color: Colors.brown.shade800,
                     icon: Icons.timer,
                     label: 'Round Reset',
                     value: fmt(intervals.roundReset),
-                    onTap: pickRoundReset,
+                    onTap: hasUniformTimes ? pickRoundReset : null,
+                    enabled: hasUniformTimes,
                   ),
+                  if (!hasUniformTimes) ...[
+                    const SizedBox(height: 12),
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Colors.orange.withValues(alpha: 0.2),
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(
+                            color: Colors.orange.withValues(alpha: 0.5)),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(Icons.info_outline, color: Colors.orange),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              'This plan has different exercise times. The selectors above are disabled.',
+                              style: TextStyle(color: Colors.orange),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                   const SizedBox(height: 12),
                   FilledButton.icon(
                     onPressed: () async {
@@ -395,7 +444,8 @@ class _ConfigTile extends StatelessWidget {
   final IconData icon;
   final String label;
   final String value;
-  final VoidCallback onTap;
+  final VoidCallback? onTap;
+  final bool enabled;
 
   const _ConfigTile({
     required this.color,
@@ -403,6 +453,7 @@ class _ConfigTile extends StatelessWidget {
     required this.label,
     required this.value,
     required this.onTap,
+    this.enabled = true,
   });
 
   @override
@@ -410,14 +461,26 @@ class _ConfigTile extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.6),
+        color: enabled
+            ? color.withValues(alpha: 0.6)
+            : Colors.grey.withValues(alpha: 0.3),
         borderRadius: BorderRadius.circular(16),
       ),
       child: ListTile(
-        leading: Icon(icon),
-        title: Text(label, style: Theme.of(context).textTheme.titleLarge),
-        trailing: Text(value, style: Theme.of(context).textTheme.titleLarge),
-        onTap: onTap,
+        leading: Icon(icon, color: enabled ? null : Colors.grey),
+        title: Text(
+          label,
+          style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                color: enabled ? null : Colors.grey,
+              ),
+        ),
+        trailing: Text(
+          value,
+          style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                color: enabled ? null : Colors.grey,
+              ),
+        ),
+        onTap: enabled ? onTap : null,
       ),
     );
   }

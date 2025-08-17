@@ -111,3 +111,12 @@ class WorkoutLog {
         notes: j['notes'],
       );
 }
+
+extension WorkoutPlanExtension on WorkoutPlan {
+  /// Returns true if all exercises have the same duration
+  bool get hasUniformExerciseTimes {
+    if (exercises.isEmpty) return true;
+    final firstDuration = exercises.first.seconds;
+    return exercises.every((exercise) => exercise.seconds == firstDuration);
+  }
+}
