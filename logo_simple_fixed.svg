@@ -1,0 +1,22 @@
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background circle -->
+  <circle cx="512" cy="512" r="480" fill="#6750A4"/>
+  
+  <!-- Timer circle -->
+  <circle cx="512" cy="512" r="360" fill="none" stroke="#FFFFFF" stroke-width="32"/>
+  
+  <!-- Timer hands -->
+  <line x1="512" y1="512" x2="512" y2="280" stroke="#FFFFFF" stroke-width="20" stroke-linecap="round"/>
+  <line x1="512" y1="512" x2="512" y2="200" stroke="#FFFFFF" stroke-width="16" stroke-linecap="round"/>
+  <circle cx="512" cy="512" r="24" fill="#FFFFFF"/>
+  
+  <!-- Timer marks -->
+  <line x1="512" y1="120" x2="512" y2="180" stroke="#FFFFFF" stroke-width="12" stroke-linecap="round"/>
+  <line x1="904" y1="512" x2="844" y2="512" stroke="#FFFFFF" stroke-width="12" stroke-linecap="round"/>
+  <line x1="512" y1="904" x2="512" y2="844" stroke="#FFFFFF" stroke-width="12" stroke-linecap="round"/>
+  <line x1="120" y1="512" x2="180" y2="512" stroke="#FFFFFF" stroke-width="12" stroke-linecap="round"/>
+  
+  <!-- Work/Rest indicator -->
+  <circle cx="512" cy="180" r="12" fill="#FF6B35"/>
+  <circle cx="512" cy="200" r="12" fill="#4CAF50"/>
+</svg>

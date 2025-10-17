@@ -14,6 +14,7 @@ class TimerSession {
   final int secondsLeft;
   final int totalElapsed; // seconds across whole session
   final SessionState state;
+  final bool isPreparation; // true during the initial countdown
 
   const TimerSession({
     required this.plan,
@@ -23,11 +24,15 @@ class TimerSession {
     required this.secondsLeft,
     required this.totalElapsed,
     required this.state,
+    this.isPreparation = false,
   });
 
-  String get currentLabel => isRest
-      ? (secondsLeft > 0 ? 'Rest' : 'Transition')
-      : plan.exercises[exerciseIndex].name;
+  String get currentLabel {
+    if (isPreparation) return 'Get Ready';
+    return isRest
+        ? (secondsLeft > 0 ? 'Rest' : 'Transition')
+        : plan.exercises[exerciseIndex].name;
+  }
 
   TimerSession copyWith({
     WorkoutPlan? plan,
@@ -37,6 +42,7 @@ class TimerSession {
     int? secondsLeft,
     int? totalElapsed,
     SessionState? state,
+    bool? isPreparation,
   }) {
     return TimerSession(
       plan: plan ?? this.plan,
@@ -46,6 +52,7 @@ class TimerSession {
       secondsLeft: secondsLeft ?? this.secondsLeft,
       totalElapsed: totalElapsed ?? this.totalElapsed,
       state: state ?? this.state,
+      isPreparation: isPreparation ?? this.isPreparation,
     );
   }
 }
@@ -66,18 +73,25 @@ class TimerController extends StateNotifier<TimerSession?> {
 
   void start(WorkoutPlan plan) {
     _ticker?.cancel();
-    final first = plan.exercises.first;
+
+    // Start with a preparation countdown (shortest of rest times, but at least 3 seconds)
+    final prepTime = [
+      plan.restBetweenExercises,
+      plan.restBetweenRounds,
+      3, // minimum prep time
+    ].where((t) => t > 0).reduce((a, b) => a < b ? a : b);
+
     state = TimerSession(
       plan: plan,
       roundIndex: 0,
       exerciseIndex: 0,
-      isRest: false,
-      secondsLeft: first.seconds,
+      isRest: true, // Start in rest mode for preparation
+      secondsLeft: prepTime,
       totalElapsed: 0,
       state: SessionState.running,
+      isPreparation: true, // Mark as preparation phase
     );
-    _announce('Starting ${plan.name}. '
-        'Round 1 of ${plan.rounds}. First: ${first.name}.');
+    _announce('Get ready! Starting ${plan.name} in $prepTime seconds.');
     _ticker = Timer.periodic(const Duration(seconds: 1), (_) => _tick());
   }
 
@@ -216,11 +230,26 @@ class TimerController extends StateNotifier<TimerSession?> {
         }
       } else {
         // Coming out of a rest → start the designated exercise
-        final ex = s.plan.exercises[s.exerciseIndex];
-        s = s.copyWith(isRest: false, secondsLeft: ex.seconds);
-        state = s;
-        _announce('Go: ${ex.name}!');
-        if (s.secondsLeft > 0) break; // zero-length exercise (edge) → loop
+        if (s.isPreparation) {
+          // Transition from preparation to first exercise
+          final first = s.plan.exercises.first;
+          s = s.copyWith(
+            isRest: false,
+            secondsLeft: first.seconds,
+            isPreparation: false,
+          );
+          state = s;
+          _announce('Round 1 of ${s.plan.rounds}. Go: ${first.name}!');
+          if (s.secondsLeft > 0) break;
+          continue;
+        } else {
+          // Normal rest → exercise transition
+          final ex = s.plan.exercises[s.exerciseIndex];
+          s = s.copyWith(isRest: false, secondsLeft: ex.seconds);
+          state = s;
+          _announce('Go: ${ex.name}!');
+          if (s.secondsLeft > 0) break; // zero-length exercise (edge) → loop
+        }
       }
     }
   }
