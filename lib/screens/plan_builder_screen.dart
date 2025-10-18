@@ -40,7 +40,7 @@ class _PlanBuilderScreenState extends ConsumerState<PlanBuilderScreen> {
             ),
             const SizedBox(height: 12),
             DropdownButtonFormField<WorkoutCategory>(
-              value: _category,
+              initialValue: _category,
               items: WorkoutCategory.values
                   .map((c) => DropdownMenuItem(value: c, child: Text(c.name)))
                   .toList(),
